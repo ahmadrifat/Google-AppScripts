@@ -1,3 +1,7 @@
+// Create a Googel Sheet. Set header in the first row as 'Time, Sender Name. Sender Email, Email Subject, Message Body, Attachments'
+// Open Appscript from Extension=> AppScript from the Menu Bar
+// VERY IMPORTANT! Don't mistake to change Date, SheetName, Folder ID where prescribed!
+
 function getEmailsToSheet() {
   var threads = GmailApp.search("after:DATE IN YYYY/MM/DD has:attachment");
   var mailSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('GIVE SHEET NAME');
