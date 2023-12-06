@@ -1,0 +1,54 @@
+function getEmailsToSheet() {
+  var threads = GmailApp.search("after:DATE IN YYYY/MM/DD has:attachment");
+  var mailSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('GIVE SHEET NAME');
+
+  if(mailSheet.getLastRow()<2){
+    var lastmailtime = 0}
+  else{
+    var lastmailtime = mailSheet.getRange("A"+mailSheet.getLastRow()).getValue()
+  }
+
+  for(var i=0;i<threads.length;i++){
+    if(threads[i].getLastMessageDate()>=lastmailtime){
+      var mails = threads[i].getMessages()
+      for(var j=0;j<mails.length;j++){
+        if(mails[j].getDate()>=lastmailtime){
+        var mail=mails[j]
+        appendMail(mail)
+        }
+      else{
+        break
+        }
+      }
+    }
+    else{
+      break
+    }
+  }
+
+  function appendMail(mail){
+    var mailtime = mail.getDate()
+    var mailSender = mail.getFrom()
+    var mailSenderName = mailSender.replace(/<.*?>/, "")
+    var mailSenderEmail = mailSender.match(/<(.*?)>/)[1]
+    var mailSubject = mail.getSubject()
+    var mailBody = mail.getPlainBody()
+    var mailAttachment = mail.getAttachments()
+    var attachmentLinks = []
+
+    for (var k=0; k<mailAttachment.length;k++){
+      var attachment = mailAttachment[k]
+      var driveFile = DriveApp.getFolderById('YOUR GOOGLE DRIVE FOLDER ID (after last / of the URL)').createFile(attachment)
+      var attachmentLink = driveFile.getUrl();
+
+      attachmentLinks.push(attachmentLink)
+    }
+    var mailAttachment = attachmentLinks.join("\n")
+
+
+    mailSheet.appendRow([mailtime,mailSenderName,mailSenderEmail,mailSubject,mailBody,mailAttachment])
+  }
+
+  mailSheet.getRange("A2:F").sort(1)
+}
+
